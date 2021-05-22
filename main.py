@@ -14,6 +14,8 @@ player_speed=10
 global enemy_speed
 enemy_speed=10
 
+global harden
+harden=0
 
 
 #максимальное количество злаков
@@ -31,16 +33,18 @@ global dangers
 dangers=[turtle.Turtle()]*(max_dangers+1)
 
 
+
+
 #Таблички с надписями
 btn1 = turtle.Turtle()
 btn2= turtle.Turtle()
 btn2.clear()
 btn2.hideturtle()
 btn2.penup()
-btn2.goto(-30,270)
-btn2.write("Берегись Квадратиков!Ешь желтые злаки!", font=("Arial", 12, "normal"))
+btn2.goto(-120,290)
+btn2.write("Берегись Квадратиков!Ешь желтые злаки!", font=("Arial", 15, "normal"))
 btn3 = turtle.Turtle()
-
+btn4 = turtle.Turtle()
 
 
 
@@ -49,9 +53,11 @@ colors=['green','maroon1','purple1','lime green','blue4','light coral']
 
 #класс для подсчета съеденных злаков
 class cereal():
-    def __init__(self,count):
+    def __init__(self,count,health_update,health):
         self.count=count
-stat=cereal(0)
+        self.health_update=health_update
+        self.health=health
+stat=cereal(0,0,1)
 #класс для подсчета единиц злаков, которые в игре
 class FoodAm():
     def __init__(self,food_now):
@@ -66,33 +72,10 @@ window.setup(screen_length,screen_height)
 
 #Объект игрока
 player=turtle.Turtle()
+player.penup()
 player.shape("turtle")
 player.color("black","green")
 
-
-
-
-'''def MakeCell():
-    lines=['rr']*12
-    for i in range (12):
-        lines[i]=turtle.Turtle()
-    #line=turtle.Turtle()
-    i=-100
-    for j in range(0, 12, 1):
-        lines[j].hideturtle()
-        lines[j].color('white')
-        lines[j].setpos(-100+i,100)
-        lines[j].speed(1000)
-        lines[j].color("black")
-        lines[j].right(90)
-        lines[j].forward(100)
-        
-        i=i+20'''
-
-    #for i in range(-100,100,10):
-     #   line.setpos(-100+i,100)
-      #  turtle.right(90)
-       # turtle.forward(100)
 
 
 
@@ -153,8 +136,12 @@ def DrawPolygon(num_sides,side_length,line_color,figure_color,first_x,first_y):
 #Функция для рисования увеличивающийся фигуры(спираль)
 def DrawSpiral(Multiple_Number,Multiple_Times,angle,line_length,line_color,figure_color,first_x,first_y):
     spiral = turtle.Turtle()
+    spiral.hideturtle()
+    spiral.speed(100)
+    spiral.penup()
     spiral.goto(first_x,first_y)
     spiral.color(line_color, figure_color)
+    spiral.pendown()
     spiral.begin_fill()
     for i in range(Multiple_Number):
         spiral.forward(i * Multiple_Times)
@@ -228,6 +215,7 @@ def Eaten():
             foods[i].penup()
             foods[i].setx(screen_length)
             foods[i].sety(screen_height)
+            stat.health_update=stat.health_update+1
             stat.count=stat.count+1
             
             btn1.clear()
@@ -236,6 +224,17 @@ def Eaten():
             btn1.goto(200,200)
             write_mes=('Score: ',stat.count)
             btn1.write(write_mes, font=("Arial", 12, "normal"))
+            
+            harden=stat.count//10
+            if stat.health_update==10:
+                stat.health_update=0
+                stat.health=stat.health+1
+            btn4.clear()
+            btn4.hideturtle()
+            btn4.penup()
+            btn4.goto(-120,270)
+            write_mes_health=("health: ",stat.health)
+            btn4.write(write_mes_health, font=("Arial", 15, "normal"))
             food_stat.food_now=food_stat.food_now-1
             AddFood()
             
@@ -274,14 +273,14 @@ def MakeEnemy():
         dangers[i]=turtle.Turtle()
         dangers[i].penup()
         dangers[i].speed(100)
-        dangers[i].color("black","red2")
+        dangers[i].color("green2","navy")
         dangers[i].shape("square")
         dangers[i].goto(randint(-180,180),-200)
     for i in range(15,20):
         dangers[i]=turtle.Turtle()
         dangers[i].penup()
         dangers[i].speed(100)
-        dangers[i].color("black","grey26")
+        dangers[i].color("indian red","magenta2")
         dangers[i].shape("square")
         dangers[i].goto(randint(-180,180),200)
 
@@ -289,30 +288,73 @@ def MakeEnemy():
 def MoveEnemy():
     for i in range(max_dangers):
         if (i>=0) and (i<5):
-            x=dangers[i].xcor()+enemy_speed+randint(0,0)
+            x=dangers[i].xcor()+enemy_speed+randint(0,0)+harden
             dangers[i].setx(x)
         if (i>=5) and (i<10):
-            x=dangers[i].xcor()-enemy_speed+randint(0,10)
+            x=dangers[i].xcor()-enemy_speed-randint(0,10)-harden
             dangers[i].setx(x)
         if (i>=10) and(i<15):
-            y=dangers[i].ycor()+enemy_speed+randint(0,15)
+            y=dangers[i].ycor()+enemy_speed+randint(0,15)+harden
             dangers[i].sety(y)
         if (i>=15) and(i<20):
-            y=dangers[i].ycor()-enemy_speed+randint(0,15)
+            y=dangers[i].ycor()-enemy_speed-randint(0,15)-harden
             dangers[i].sety(y)
 
 def Losing():
     for i in range(max_dangers):
-        if abs(dangers[i].xcor()-player.xcor())<10 and abs(dangers[i].ycor()-player.ycor())<10:
-        
-            btn3.clear()
-            btn3.hideturtle()
-            btn3.penup()
-            btn3.goto(0,0)
-            turtle.bye()
+        if abs(dangers[i].xcor()-player.xcor())<20 and abs(dangers[i].ycor()-player.ycor())<20:
+            btn4.clear()
+            btn4.hideturtle()
+            btn4.penup()
+            btn4.goto(-120,270)
+            write_mes_health=("health: ",stat.health)
+            btn4.write(write_mes_health, font=("Arial", 15, "normal"))
+            stat.health=stat.health-1
+            if stat.health<1:
+                turtle.bye()
+        elif (player.xcor()**2+player.ycor()**2)>40000:
+            stat.health=stat.health-1
+            btn4.clear()
+            btn4.hideturtle()
+            btn4.penup()
+            btn4.goto(-120,270)
+            write_mes_health=("health: ",stat.health)
+            btn4.write(write_mes_health, font=("Arial", 15, "normal"))
+            if stat.health<1:
+                turtle.bye()
             
-            btn3.write("Game Over", font=("Arial", 22, "normal"))
-            turtle.exitonclick()
+
+
+#Функция для перезапуска врагов
+def RespawnEnemy():
+    for i in range(max_dangers):
+        if dangers[i].xcor()>600 or dangers[i].xcor()<-600 or dangers[i].ycor()>600 or dangers[i].ycor()<-600:
+            for i in range(5):
+                
+                dangers[i].penup()
+                dangers[i].goto(-200,randint(-180,180))
+                dangers[i].speed(100)
+                
+            for i in range(5,10):
+                
+                dangers[i].penup()
+                dangers[i].speed(100)
+                
+                dangers[i].goto(200,randint(-180,180))
+            for i in range(10,15):
+                
+                dangers[i].penup()
+                dangers[i].speed(100)
+                
+                dangers[i].goto(randint(-180,180),-200)
+            for i in range(15,20):
+                
+                dangers[i].penup()
+                dangers[i].speed(100)
+               
+                dangers[i].goto(randint(-180,180),200)
+
+
 
 
 
@@ -322,35 +364,37 @@ def up():
     player.sety(y)
     player.setheading(90)
     Eaten()
-    Losing()
+    MoveEnemy()
+    RespawnEnemy()
+   # Losing()
 
 def down():
     y = player.ycor() - player_speed
     player.sety(y)
     player.setheading(-90)
     Eaten()
-    Losing()
+    MoveEnemy()
+    RespawnEnemy()
+   # Losing()
     
 def left():
     x = player.xcor() - player_speed
     player.setx(x)
     player.setheading(180)
     Eaten()
-    Losing()
+    MoveEnemy()
+    RespawnEnemy()
+   # Losing()
 
 def right():
     x = player.xcor() + player_speed
     player.setx(x)
     player.setheading(0)
     Eaten()
-    Losing()
-
-
-
-
-
-
-
+    MoveEnemy()
+    RespawnEnemy()
+   # Losing()
+    
 
 
 #Нарисуем окружение
@@ -364,9 +408,9 @@ for i in range(10):
     DrawStar(5,144,30,'red',choice(colors),randint(-screen_length/2, screen_length/2),randint(-screen_length/2.5, screen_length/2.5))
 for i in range(10):
     DrawStar(8,135,30,'red',choice(colors),randint(-screen_length/2, screen_length/2),randint(-screen_length/2.5, screen_length/2.5))
-
-
-
+DrawSpiral(20,5,144,20,"","gold",300,-250)
+DrawSpiral(20,5,144,20,"","blue2",-300,250)
+DrawSpiral(20,5,144,20,"","green2",-300,-250)
 
 
 
@@ -376,14 +420,11 @@ MakeEnemy()
 
 #считывание нажатий мыши
 turtle.listen()
-turtle.onkeypress(up, 'Up')
-turtle.onkeypress(down, 'Down')
-turtle.onkeypress(left, 'Left')
-turtle.onkeypress(right, 'Right')
-turtle.onkey(MoveEnemy, 'Up')
-turtle.onkey(MoveEnemy, 'Down')
-turtle.onkey(MoveEnemy, 'Left')
-turtle.onkey(MoveEnemy, 'Right')
+turtle.onkey(up, 'Up')
+turtle.onkey(down, 'Down')
+turtle.onkey(left, 'Left')
+turtle.onkey(right, 'Right')
+
 
 #Завершение
 turtle.done()
