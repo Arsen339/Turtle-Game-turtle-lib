@@ -14,6 +14,7 @@ player_speed=10
 global enemy_speed
 enemy_speed=10
 
+#увеличение скорости игрока
 global harden
 harden=0
 
@@ -26,9 +27,11 @@ max_food=20
 global foods
 foods=[turtle.Turtle()]*(max_food+1)
 
+#максимальное число врагов
 global max_dangers
 max_dangers=20
 
+#массив врагов
 global dangers
 dangers=[turtle.Turtle()]*(max_dangers+1)
 
@@ -115,6 +118,7 @@ def DrawStar(angle_am,angle,line_length,line_color,figure_color,first_x,first_y)
     star.begin_fill()
     for i in range(angle_am):
         star.forward(line_length)
+        #поворот на угол
         star.right(angle)
     star.end_fill()
     
@@ -208,23 +212,20 @@ def Eaten():
     for i in range(len(foods)-1):
         #if (len(foods))>2:
         if (abs(player.ycor()-foods[i].ycor())<16 and abs(player.xcor()-foods[i].xcor())<16):
-            #foods[i].hideturtle
-            #foods[i].setx(300)
-            #foods[i].sety(300)
             
             foods[i].penup()
             foods[i].setx(screen_length)
             foods[i].sety(screen_height)
             stat.health_update=stat.health_update+1
             stat.count=stat.count+1
-            
+            #надпись о статистике съеденного
             btn1.clear()
             btn1.hideturtle()
             btn1.penup()
             btn1.goto(200,200)
             write_mes=('Score: ',stat.count)
             btn1.write(write_mes, font=("Arial", 12, "normal"))
-            
+            #увеличение скорости
             harden=stat.count//10
             if stat.health_update==10:
                 stat.health_update=0
@@ -300,6 +301,7 @@ def MoveEnemy():
             y=dangers[i].ycor()-enemy_speed-randint(0,15)-harden
             dangers[i].sety(y)
 
+#уменьшение жизней и проигрыш
 def Losing():
     for i in range(max_dangers):
         if abs(dangers[i].xcor()-player.xcor())<20 and abs(dangers[i].ycor()-player.ycor())<20:
@@ -366,7 +368,7 @@ def up():
     Eaten()
     MoveEnemy()
     RespawnEnemy()
-   # Losing()
+    Losing()
 
 def down():
     y = player.ycor() - player_speed
@@ -375,7 +377,7 @@ def down():
     Eaten()
     MoveEnemy()
     RespawnEnemy()
-   # Losing()
+    Losing()
     
 def left():
     x = player.xcor() - player_speed
@@ -384,7 +386,7 @@ def left():
     Eaten()
     MoveEnemy()
     RespawnEnemy()
-   # Losing()
+    Losing()
 
 def right():
     x = player.xcor() + player_speed
@@ -393,7 +395,7 @@ def right():
     Eaten()
     MoveEnemy()
     RespawnEnemy()
-   # Losing()
+    Losing()
     
 
 
