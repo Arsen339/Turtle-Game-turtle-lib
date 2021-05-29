@@ -39,7 +39,7 @@ class Cereal:
         self.health = health
 
 
-stat = Cereal(0, 0, 40)
+stat = Cereal(0, 0, 10)
 
 
 # класс для подсчета единиц злаков, которые в игре
